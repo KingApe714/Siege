@@ -10,12 +10,15 @@ let numberOfResources = 300;
 let enemiesInterval = 600;
 let frame = 0;
 let gameOver = false;
+let score = 0;
+const winningScore = 50;
 
 const gameGrid = [];
 const defenders = [];
 const enemies = [];
 const enemyPositions = [];
 const projectiles = [];
+const resources = [];
 
 //mouse
 const mouse = {
@@ -91,6 +94,15 @@ function handleProjectiles(){
         projectiles[i].update();
         projectiles[i].draw();
 
+        for (let j = 0; j < enemies.length; j++) {
+            if (enemies[j] && projectiles[i] && collision(projectiles[i], enemies[j])) 
+            {
+                enemies[j].health -= projectiles[i].power;
+                projectiles.splice(i, 1);
+                i--;
+            }
+        }
+
         if (projectiles[i] && projectiles[i].x > canvas.width - cellSize) {
             projectiles.splice(i, 1);
             i--;
@@ -104,8 +116,8 @@ class Defender {
     constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.width = cellSize;
-        this.height = cellSize;
+        this.width = cellSize - cellGap * 2;
+        this.height = cellSize - cellGap * 2;
         this.shooting = false;
         this.health = 100;
         this.projectiles = [];
@@ -119,15 +131,19 @@ class Defender {
         ctx.fillText(Math.floor(this.health), this.x + 15, this.y + 30)
     }
     update(){
-        this.timer++;
-        if (this.timer % 100 === 0) {
-            projectiles.push(new Projectile(this.x + 70, this.y + 50))
+        if (this.shooting) {
+            this.timer++;
+            if (this.timer % 100 === 0) {
+                projectiles.push(new Projectile(this.x + 70, this.y + 50))
+            }
+        } else {
+            this.timer = 0;
         }
     }
 }
 canvas.addEventListener('click', function(){
-    const gridPositionX = mouse.x - (mouse.x % cellSize);
-    const gridPositionY = mouse.y - (mouse.y % cellSize);
+    const gridPositionX = mouse.x - (mouse.x % cellSize) + cellGap;
+    const gridPositionY = mouse.y - (mouse.y % cellSize) + cellGap;
     if (gridPositionY < cellSize) return;
     for (let i = 0; i < defenders.length; i++) {
         if (defenders[i].x === gridPositionX && defenders[i].y === gridPositionY) return;
@@ -142,6 +158,11 @@ function handleDefenders(){
     for (let i = 0; i < defenders.length; i++) {
         defenders[i].draw();
         defenders[i].update();
+        if (enemyPositions.indexOf(defenders[i].y) !== -1) {
+            defenders[i].shooting = true;
+        } else {
+            defenders[i].shooting = false;
+        }
         for (let j = 0; j < enemies.length; j++) {
             if (defenders[i] && collision(defenders[i], enemies[j])) {
                 enemies[j].movement = 0;
@@ -160,8 +181,8 @@ class Enemy {
     constructor(verticalPosition) {
         this.x = canvas.width;
         this.y = verticalPosition;
-        this.width = cellSize;
-        this.height = cellSize;
+        this.width = cellSize - cellGap * 2;
+        this.height = cellSize - cellGap * 2;
         this.speed = Math.random() * 0.2 + 0.4;
         this.movement = this.speed;
         this.health = 100;
@@ -185,25 +206,75 @@ function handleEnemies(){
         if (enemies[i].x < 0) {
             gameOver = true;
         }
+        if (enemies[i].health <= 0) {
+            let gainedResources = enemies[i].maxHealth/10;
+            numberOfResources += gainedResources;
+            score += gainedResources;
+            const findThisIndex = enemyPositions.indexOf(enemies[i].y)
+            enemyPositions.splice(findThisIndex, 1);
+            enemies.splice(i, 1)
+            i--;
+            console.log(enemyPositions)
+        }
     }
-    if (frame % enemiesInterval === 0) {
-        let verticalPosition = Math.floor(Math.random() * 5 + 1) * cellSize;
+    if (frame % enemiesInterval === 0 && score < winningScore) {
+        let verticalPosition = Math.floor(Math.random() * 5 + 1) * cellSize + cellGap;
         enemies.push(new Enemy(verticalPosition));
         enemyPositions.push(verticalPosition);
         if (enemiesInterval > 120) enemiesInterval -= 50;
+        console.log(enemyPositions)
+
     }
 }
 
 // resources
+const amounts = [20, 30, 40];
+class Resource {
+    constructor(){
+        this.x = Math.random() * (canvas.width - cellSize);
+        this.y = (Math.floor(Math.random() * 5) + 1) * cellSize + 25;
+        this.width = cellSize * 0.6;
+        this.height = cellSize * 0.6;
+        this.amount = amounts[Math.floor(Math.random() * amounts.length)]
+    }
+    draw(){
+        ctx.fillStyle = 'yellow';
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+        ctx.fillStyle = 'black';
+        ctx.font = '20px Orbitron';
+        ctx.fillText(this.amount, this.x + 15, this.y + 25);
+    }
+}
+function handleResources(){
+    if (frame % 500 === 0 && score < winningScore) {
+        resources.push(new Resource())
+    }
+    for (let i = 0; i < resources.length; i++) {
+        resources[i].draw();
+        if (resources[i] && mouse.x && mouse.y && collision(resources[i], mouse)) {
+            numberOfResources += resources[i].amount;
+            resources.splice(i, 1);
+            i--;
+        }
+    }
+}
 // utilities
 function handleGameStatus() {
     ctx.fillStyle = 'gold';
     ctx.font = '30px Orbitron';
-    ctx.fillText('Resources: ' + numberOfResources, 20, 55);
+    ctx.fillText('Score: ' + score, 20, 40);
+    ctx.fillText('Resources: ' + numberOfResources, 20, 80);
     if (gameOver) {
         ctx.fillStyle = 'black';
         ctx.font = '90px Orbitron';
         ctx.fillText('GAME OVER', 135, 330);
+    }
+    if (score >= winningScore && enemies.length === 0) {
+        ctx.fillStyle = 'black';
+        ctx.font = '60px Orbitron';
+        ctx.fillText('LEVEL COMPLETE', 130, 300);
+        ctx.font = '30px Orbitron'
+        ctx.fillText('You win with ' + score + ' points!', 134, 340)
     }
 }
 
@@ -213,6 +284,7 @@ function animate(){
     ctx.fillRect(0,0,controlsBar.width, controlsBar.height);
     handleGameGrid();
     handleDefenders();
+    handleResources();
     handleProjectiles();
     handleEnemies();
     handleGameStatus();
@@ -231,3 +303,7 @@ function collision(first, second) {
         return true;
     };
 };
+
+window.addEventListener('resize', function(){
+    canvasPosition = canvas.getBoundingClientRect();
+})
