@@ -1,0 +1,30 @@
+{
+  "name": "Siege",
+  "version": "1.0.0",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KingApe714/Siege.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KingApe714/Siege/issues"
+  },
+  "homepage": "https://github.com/KingApe714/Siege#readme",
+  "devDependencies": {
+    "webpack-cli": "^4.5.0"
+  },
+  "dependencies": {
+    "@babel/core": "^7.13.8",
+    "@babel/preset-env": "^7.13.9",
+    "@babel/preset-react": "^7.12.13",
+    "babel-loader": "^8.2.2",
+    "webpack": "^4.46.0"
+  }
+}

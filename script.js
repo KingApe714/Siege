@@ -14,7 +14,7 @@ let score = 0;
 const winningScore = 50;
 
 const gameGrid = [];
-const defenders = [];
+// const defenders = [];
 const enemies = [];
 const enemyPositions = [];
 const projectiles = [];
@@ -112,6 +112,10 @@ function handleProjectiles(){
 }
 
 // defenders
+const defenders = [];
+const wizard1 = new Image();
+wizard1.src = 'wizard1.png'
+defenders.push(wizard1)
 class Defender {
     constructor(x, y) {
         this.x = x;
@@ -122,6 +126,13 @@ class Defender {
         this.health = 100;
         this.projectiles = [];
         this.timer = 0;
+        this.defenderType = defenders[0];
+        this.frameX = 0;
+        this.frameY = 0;
+        this.minFrame = 0;
+        this.maxFrame = 4;
+        this.spriteWidth = 34;
+        this.spriteHeight = 68;
     }
     draw(){
         ctx.fillStyle = 'blue';
@@ -144,8 +155,8 @@ class Defender {
 
 function handleDefenders(){
     for (let i = 0; i < defenders.length; i++) {
-        defenders[i].draw();
-        defenders[i].update();
+        // defenders[i].draw();
+        // defenders[i].update();
         if (enemyPositions.indexOf(defenders[i].y) !== -1) {
             defenders[i].shooting = true;
         } else {
@@ -201,6 +212,11 @@ function handleFloatingMessages(){
     }
 }
 // enemies
+const enemyTypes = [];
+const enemy1 = new Image();
+enemy1.src = 'enemy1.png';
+enemyTypes.push(enemy1);
+
 class Enemy {
     constructor(verticalPosition) {
         this.x = canvas.width;
@@ -211,9 +227,18 @@ class Enemy {
         this.movement = this.speed;
         this.health = 100;
         this.maxHealth = this.health;
+        this.enemyType = enemyTypes[0];
+        this.frameX = 0;
+        this.frameY = 0;
+        this.minFrame = 0;
+        this.maxframe = 1;
+        this.spriteWidth = 34;
+        this.spriteHeight = 34;
     }
     update(){
         this.x -= this.movement;
+        if (this.frameX < this.maxFrame) this.frameX++;
+        else this.frameX = this.minFrame;
     }
     draw(){
         ctx.fillStyle = 'red';
@@ -221,6 +246,7 @@ class Enemy {
         ctx.fillStyle = 'black';
         ctx.font = '30px Orbitron';
         ctx.fillText(Math.floor(this.health), this.x + 15, this.y + 30);
+        ctx.drawImage(this.enemyType, this.frameX*this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height)
     }
 }
 function handleEnemies(){
@@ -233,7 +259,7 @@ function handleEnemies(){
         if (enemies[i].health <= 0) {
             let gainedResources = enemies[i].maxHealth/10;
             floatingMessages.push(new floatingMessage('+' + gainedResources, enemies[i].x, enemies[i].y, 30, 'gold'))
-            floatingMessages.push(new floatingMessage('+' + gainedResources, 250, 50, 30, 'black'))
+            floatingMessages.push(new floatingMessage('+' + gainedResources, 250, 50, 30, 'gold'))
             numberOfResources += gainedResources;
             score += gainedResources;
             const findThisIndex = enemyPositions.indexOf(enemies[i].y)
