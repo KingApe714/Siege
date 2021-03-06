@@ -54,14 +54,16 @@ class Cell {
         this.height = cellSize;
     }
     draw(){
-        if (mouse.x && mouse.y && collision(this, mouse)) {
-            ctx.strokeStyle = 'black';
-            ctx.strokeRect(this.x, this.y, this.width, this.height)
-        }
+        // if (mouse.x && mouse.y && collision(this, mouse)) {
+        //     ctx.fillStyle = 'gray';
+        //     ctx.fillRect(this.x, this.y, this.width, this.height);
+            // ctx.strokeStyle = 'black';
+            // ctx.strokeRect(this.x, this.y, this.width, this.height)
+        // }
     }
 }
 function createGrid(){
-    for (let y = cellSize; y < canvas.height; y += cellSize) {
+    for (let y = 0; y < canvas.height - cellSize; y += cellSize) {
         for (let x = 0; x < canvas.width; x +=  cellSize) {
             gameGrid.push(new Cell(x, y));
         }
@@ -290,7 +292,7 @@ function handleEnemies(){
         }
     }
     if (frame % enemiesInterval === 0 && score < winningScore) {
-        let verticalPosition = Math.floor(Math.random() * 5 + 1) * cellSize + cellGap;
+        let verticalPosition = Math.floor(Math.random() * 5) * cellSize + cellGap;
         enemies.push(new Enemy(verticalPosition));
         enemyPositions.push(verticalPosition);
         if (enemiesInterval > 120) enemiesInterval -= 50;
@@ -336,8 +338,8 @@ function handleEnemies(){
 function handleGameStatus() {
     ctx.fillStyle = 'gold';
     ctx.font = '30px DotGothic16';
-    ctx.fillText('Score: ' + score, 20, 40);
-    ctx.fillText('Resources: ' + numberOfResources, 20, 80);
+    ctx.fillText('Score: ' + score, 680, 540);
+    ctx.fillText('Resources: ' + numberOfResources, 680, 580);
     if (gameOver) {
         ctx.fillStyle = 'black';
         ctx.font = '90px DotGothic16';
@@ -355,7 +357,7 @@ function handleGameStatus() {
 canvas.addEventListener('click', function(){
     const gridPositionX = mouse.x - (mouse.x % cellSize) + cellGap;
     const gridPositionY = mouse.y - (mouse.y % cellSize) + cellGap;
-    if (gridPositionY < cellSize) return;
+    if (gridPositionY > canvas.height - cellSize) return;
     for (let i = 0; i < defenders.length; i++) {
         if (defenders[i].x === gridPositionX && defenders[i].y === gridPositionY) return;
     }
@@ -370,8 +372,8 @@ canvas.addEventListener('click', function(){
 
 function animate(){
     ctx.clearRect(0, 0, canvas.width, canvas.height)
-    ctx.fillStyle = 'blue';
-    ctx.fillRect(0,0,controlsBar.width, controlsBar.height);
+    ctx.fillStyle = 'gray';
+    ctx.fillRect(0,500,controlsBar.width, controlsBar.height);
     handleGameGrid();
     handleDefenders();
     // handleResources();
