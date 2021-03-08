@@ -228,7 +228,7 @@ function handleEnemies(){
         }
     }
     if (frame % enemiesInterval === 0 && score < winningScore) {
-        let verticalPosition = Math.floor(Math.random() * 8) * cellSize + cellGap;
+        let verticalPosition = Math.floor(Math.random() * ((canvas.height / 100) - 1)) * cellSize + cellGap;
         //ensure that the enemies don't appear on top of each other
         if (enemies.filter(enemy => enemy.y !== verticalPosition)) {
             enemies.push(new Enemy(verticalPosition));
@@ -282,6 +282,7 @@ function handleGameStatus() {
         ctx.fillText('GAME OVER', 135, 330);
     }
     if (wall.health <= 0) {
+        gameOver = true;
         ctx.fillStyle = 'black';
         ctx.font = '60px DotGothic16';
         ctx.fillText('LEVEL COMPLETE', 130, 300);
@@ -302,9 +303,7 @@ canvas.addEventListener('click', function(){
         attackers.push(new Attacker(gridPositionX, gridPositionY))
         numResources -= attackerCost;
     } else {
-        ctx.fillStyle = 'blue';
-        ctx.font = '30px DotGothic16';
-        ctx.fillText('Not enough resources', 130, 300)
+        //need to render a message to user letting them know they need more resources
     }
 })
 
