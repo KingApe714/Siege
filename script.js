@@ -289,14 +289,21 @@ class EnemyWall {
         this.wallHeight = 912;
     }
     draw(){
-        ctx.drawImage(castleWall, 0, 0, this.wallWidth, this.wallHeight, canvas.width - 100, 0, cellSize, 500)
+        ctx.drawImage(castleWall, 0, 0, this.wallWidth, this.wallHeight, canvas.width - 100, 0, cellSize, canvas.height - cellSize)
+        ctx.fillStyle = 'black';
+        ctx.font = '25px DotGothic16';
+        ctx.fillText('Wall:', canvas.width - 80, canvas.height - cellSize - 100);
+        ctx.fillText(this.health, canvas.width - 80, canvas.height - cellSize - 50)
     }
 }
 
+let wall = new EnemyWall();
 function handleWall() {
+    wall.draw();
     for (let i = 0; i < projectiles.length; i++) {
-        if (collision(projectiles[i], )){
-
+        if (collision(projectiles[i], wall)){
+            wall.health -= projectiles[i].power;
+            console.log(wall.health)
         }
     }
 }
@@ -311,7 +318,7 @@ function handleGameStatus() {
         ctx.font = '90px DotGothic16';
         ctx.fillText('GAME OVER', 135, 330);
     }
-    if (score >= winningScore && enemies.length === 0) {
+    if (wall.health <= 0) {
         ctx.fillStyle = 'black';
         ctx.font = '60px DotGothic16';
         ctx.fillText('LEVEL COMPLETE', 130, 300);
@@ -344,6 +351,7 @@ function animate(){
     handleDefenders();
     handleProjectiles();
     handleEnemies();
+    handleWall();
     handleGameStatus();
     handleFloatingMessages();
     frame++;
