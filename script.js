@@ -1,25 +1,24 @@
 const canvas = document.getElementById('canvas1');
 const ctx = canvas.getContext('2d');
 canvas.width = 1200;
-canvas.height = 800;
+canvas.height = 900;
 
 // global variables
 const cellSize = 100;
 const cellGap = 3;
-let numberOfResources = 300;
-let enemiesInterval = 600;
+const winningScore = 50;
+let numResources = 300;
+let enemiesInterval = 400;
 let frame = 0;
 let gameOver = false;
 let score = 0;
-const winningScore = 50;
 let hue = 0;
 
 const gameGrid = [];
-const defenders = [];
+const attackers = [];
 const enemies = [];
 const enemyPositions = [];
 const projectiles = [];
-const resources = [];
 
 //mouse
 const mouse = {
@@ -51,7 +50,8 @@ class Cell {
         this.height = cellSize;
     }
     draw(){
-        
+        ctx.strokeStyle = 'black'
+        ctx.strokeRect(this.x, this.y, this.width, this.height);
     }
 }
 function createGrid(){
@@ -63,9 +63,9 @@ function createGrid(){
 }
 createGrid();
 function handleGameGrid(){
-    for (let i = 0; i < gameGrid.length; i++) {
-        gameGrid[i].draw();
-    }
+    gameGrid.forEach(cell => {
+        cell.draw();
+    })
 }
 
 // projectiles
@@ -92,14 +92,13 @@ function handleProjectiles(){
     for (let i = 0; i < projectiles.length; i++) {
         projectiles[i].update();
         projectiles[i].draw();
-        for (let j = 0; j < enemies.length; j++) {
-            if (enemies[j] && projectiles[i] && collision(projectiles[i], enemies[j])) 
-            {
-                enemies[j].health -= projectiles[i].power;
+        enemies.forEach(enemy => {
+            if (enemy && projectiles[i] && collision(enemy, projectiles[i])) {
+                enemy.health -= projectiles[i].power;
                 projectiles.splice(i, 1);
                 i--;
             }
-        }
+        })
         if (projectiles[i] && projectiles[i].x > canvas.width - cellSize) {
             projectiles.splice(i, 1);
             i--;
@@ -107,9 +106,9 @@ function handleProjectiles(){
     }
 }
 
-const defender1 = new Image();
-defender1.src = './images/wizard1.png';
-class Defender {
+const attacker1 = new Image();
+attacker1.src = './images/wizard1.png';
+class Attacker {
     constructor(x, y) {
         this.x = x;
         this.y = y;
@@ -120,7 +119,7 @@ class Defender {
         this.health = 100;
         this.projectiles = [];
         this.timer = 0;
-        this.defenderType = defenders[0];
+        this.attackerType = attackers[0];
         this.frameX = 0;
         this.frameY = 0;
         this.spriteWidth = 34;
@@ -129,7 +128,7 @@ class Defender {
         this.maxFrame = 1;
     }
     draw(){
-        ctx.drawImage(defender1, this.frameX * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height)
+        ctx.drawImage(attacker1, this.frameX * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height)
         ctx.fillStyle = 'gold';
         ctx.font = '20px DotGothic16';
         ctx.fillText(Math.floor(this.health), this.x + 15, this.y + 30)
@@ -152,59 +151,22 @@ class Defender {
     }
 }
 
-function handleDefenders(){
-    for (let i = 0; i < defenders.length; i++) {
-        defenders[i].draw();
-        defenders[i].update();
-        for (let j = 0; j < enemies.length; j++) {
-            if (defenders[i] && collision(defenders[i], enemies[j])) {
-                defenders[i].movement = 0;
-                defenders[i].health -= 0.2;
+function handleAttackers(){
+    for (let i = 0; i < attackers.length; i++) {
+        attackers[i].draw();
+        attackers[i].update();
+        enemies.forEach(enemy => {
+            if (attackers[i] && collision(attackers[i], enemy)) {
+                attackers[i].movement = 0;
+                attackers[i].health -= 0.2;
             } else {
-                defenders[i].movement = defenders[i].speed;
+                attackers[i].movement = attackers[i].speed;
             }
-            if (defenders[i] && defenders[i].health <= 0) {
-                defenders.splice(i, 1);
+            if (attackers[i] && attackers[i].health <= 0) {
+                attackers.splice(i, 1);
                 i--;
-                enemies[j].movement = enemies[j].speed;
             }
-        }
-    }
-}
-
-// Floating Messages
-const floatingMessages = [];
-class floatingMessage {
-    constructor(value, x, y, size, color) {
-        this.value = value;
-        this.x = x;
-        this.y = y;
-        this.size = size;
-        this.lifeSpan = 0;
-        this.color = color;
-        this.opacity = 1;
-    }
-    update() {
-        this.y -= 0.3;
-        this.lifeSpan += 1;
-        if (this.opacity > 0.03) this.opacity -= 0.03
-    }
-    draw() {
-        ctx.globalAlpha = this.opacity;
-        ctx.fillStyle = this.color;
-        ctx.font = this.size + 'px DotGothic16';
-        ctx.fillText(this.value, this.x, this.y)
-        ctx.globalAlpha = 1;
-    }
-}
-function handleFloatingMessages(){
-    for (let i = 0; i < floatingMessages.length; i++) {
-        floatingMessages[i].update();
-        floatingMessages[i].draw();
-        if (floatingMessages[i].lifeSpan >= 50) {
-            floatingMessages.splice(i, 1);
-            i--;
-        }
+        })
     }
 }
 // enemies
@@ -257,9 +219,7 @@ function handleEnemies(){
         }
         if (enemies[i].health <= 0) {
             let gainedResources = Math.floor(enemies[i].maxHealth/3);
-            floatingMessages.push(new floatingMessage('+' + gainedResources, enemies[i].x, enemies[i].y, 30, 'gold'))
-            floatingMessages.push(new floatingMessage('+' + gainedResources, 770, 530, 30, 'gold'))
-            numberOfResources += gainedResources;
+            numResources += gainedResources;
             score += gainedResources;
             const findThisIndex = enemyPositions.indexOf(enemies[i].y)
             enemyPositions.splice(findThisIndex, 1);
@@ -268,9 +228,12 @@ function handleEnemies(){
         }
     }
     if (frame % enemiesInterval === 0 && score < winningScore) {
-        let verticalPosition = Math.floor(Math.random() * 5) * cellSize + cellGap;
-        enemies.push(new Enemy(verticalPosition));
-        enemyPositions.push(verticalPosition);
+        let verticalPosition = Math.floor(Math.random() * 8) * cellSize + cellGap;
+        //ensure that the enemies don't appear on top of each other
+        if (enemies.filter(enemy => enemy.y !== verticalPosition)) {
+            enemies.push(new Enemy(verticalPosition));
+            enemyPositions.push(verticalPosition);
+        }
         if (enemiesInterval > 120) enemiesInterval -= 50;
     }
 }
@@ -300,19 +263,19 @@ class EnemyWall {
 let wall = new EnemyWall();
 function handleWall() {
     wall.draw();
-    for (let i = 0; i < projectiles.length; i++) {
-        if (collision(projectiles[i], wall)){
-            wall.health -= projectiles[i].power;
-            console.log(wall.health)
+    projectiles.forEach(p => {
+        if (collision(p, wall)) {
+            wall.health -= p.power;
+            score += p.power;
         }
-    }
+    })
 }
 // utilities
 function handleGameStatus() {
     ctx.fillStyle = 'gold';
     ctx.font = '30px DotGothic16';
     ctx.fillText('Score: ' + score, canvas.width - 250, canvas.height - 65);
-    ctx.fillText('Resources: ' + numberOfResources, canvas.width - 250, canvas.height - 25);
+    ctx.fillText('Resources: ' + numResources, canvas.width - 250, canvas.height - 25);
     if (gameOver) {
         ctx.fillStyle = 'black';
         ctx.font = '90px DotGothic16';
@@ -331,15 +294,17 @@ canvas.addEventListener('click', function(){
     const gridPositionX = mouse.x - (mouse.x % cellSize) + cellGap;
     const gridPositionY = mouse.y - (mouse.y % cellSize) + cellGap;
     if (gridPositionY > canvas.height - cellSize) return;
-    for (let i = 0; i < defenders.length; i++) {
-        if (defenders[i].x === gridPositionX && defenders[i].y === gridPositionY) return;
+    for (let i = 0; i < attackers.length; i++) {
+        if (attackers[i].x === gridPositionX && attackers[i].y === gridPositionY) return;
     }
-    let defenderCost = 100;
-    if (numberOfResources >= defenderCost) {
-        defenders.push(new Defender(gridPositionX, gridPositionY))
-        numberOfResources -= defenderCost;
+    let attackerCost = 100;
+    if (numResources >= attackerCost) {
+        attackers.push(new Attacker(gridPositionX, gridPositionY))
+        numResources -= attackerCost;
     } else {
-        floatingMessages.push(new floatingMessage('need more resources', mouse.x, mouse.y, 20, 'blue'))
+        ctx.fillStyle = 'blue';
+        ctx.font = '30px DotGothic16';
+        ctx.fillText('Not enough resources', 130, 300)
     }
 })
 
@@ -348,12 +313,11 @@ function animate(){
     ctx.fillStyle = 'gray';
     ctx.fillRect(0,canvas.height-cellSize,controlsBar.width, controlsBar.height);
     handleGameGrid();
-    handleDefenders();
+    handleAttackers();
     handleProjectiles();
     handleEnemies();
     handleWall();
     handleGameStatus();
-    handleFloatingMessages();
     frame++;
     hue += 3;
     if (!gameOver) requestAnimationFrame(animate);
