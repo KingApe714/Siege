@@ -17,7 +17,7 @@ let hue = 0;
 const gameGrid = [];
 const attackers = [];
 const enemies = [];
-const enemyPositions = [];
+const enemyCoordinates = [];
 const projectiles = [];
 
 //mouse
@@ -106,6 +106,7 @@ function handleProjectiles(){
     }
 }
 
+//attackers
 const attacker1 = new Image();
 attacker1.src = './images/wizard1.png';
 class Attacker {
@@ -176,9 +177,9 @@ enemy1.src = './images/enemy1.png';
 enemyTypes.push(enemy1);
 
 class Enemy {
-    constructor(verticalPosition) {
+    constructor(yCoordinate) {
         this.x = canvas.width - 200;
-        this.y = verticalPosition;
+        this.y = yCoordinate;
         this.width = cellSize - cellGap * 2;
         this.height = cellSize - cellGap * 2;
         this.speed = Math.random() * 0.2 + 0.4;
@@ -221,18 +222,18 @@ function handleEnemies(){
             let gainedResources = Math.floor(enemies[i].maxHealth/3);
             numResources += gainedResources;
             score += gainedResources;
-            const findThisIndex = enemyPositions.indexOf(enemies[i].y)
-            enemyPositions.splice(findThisIndex, 1);
+            const idx = enemyCoordinates.indexOf(enemies[i].y)
+            enemyCoordinates.splice(idx, 1);
             enemies.splice(i, 1)
             i--;
         }
     }
     if (frame % enemiesInterval === 0 && score < winningScore) {
-        let verticalPosition = Math.floor(Math.random() * ((canvas.height / 100) - 1)) * cellSize + cellGap;
+        let yCoordinate = Math.floor(Math.random() * ((canvas.height / 100) - 1)) * cellSize + cellGap;
         //ensure that the enemies don't appear on top of each other
-        if (enemies.filter(enemy => enemy.y !== verticalPosition)) {
-            enemies.push(new Enemy(verticalPosition));
-            enemyPositions.push(verticalPosition);
+        if (enemies.filter(enemy => enemy.y !== yCoordinate)) {
+            enemies.push(new Enemy(yCoordinate));
+            enemyCoordinates.push(yCoordinate);
         }
         if (enemiesInterval > 120) enemiesInterval -= 50;
     }
