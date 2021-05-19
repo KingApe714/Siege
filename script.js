@@ -63,9 +63,12 @@ function createGrid(){
 }
 createGrid();
 function handleGameGrid(){
-    gameGrid.forEach(cell => {
+    for (cell of gameGrid) {
         cell.draw();
-    })
+    }
+    // gameGrid.forEach(cell => {
+    //     cell.draw();
+    // })
 }
 
 // projectiles
@@ -92,13 +95,15 @@ function handleProjectiles(){
     for (let i = 0; i < projectiles.length; i++) {
         projectiles[i].update();
         projectiles[i].draw();
-        enemies.forEach(enemy => {
+        for (enemy of enemies) {
             if (enemy && projectiles[i] && collision(enemy, projectiles[i])) {
                 enemy.health -= projectiles[i].power;
                 projectiles.splice(i, 1);
                 i--;
             }
-        })
+        }
+        // enemies.forEach(enemy => {
+        // })
         if (projectiles[i] && projectiles[i].x > canvas.width - cellSize) {
             projectiles.splice(i, 1);
             i--;
@@ -156,7 +161,7 @@ function handleAttackers(){
     for (let i = 0; i < attackers.length; i++) {
         attackers[i].draw();
         attackers[i].update();
-        enemies.forEach(enemy => {
+        for (enemy of enemies) {
             if (attackers[i] && collision(attackers[i], enemy)) {
                 attackers[i].movement = 0;
                 attackers[i].health -= 0.2;
@@ -167,7 +172,9 @@ function handleAttackers(){
                 attackers.splice(i, 1);
                 i--;
             }
-        })
+        }
+        // enemies.forEach(enemy => {
+        // })
     }
 }
 // enemies
@@ -264,12 +271,14 @@ class EnemyWall {
 let wall = new EnemyWall();
 function handleWall() {
     wall.draw();
-    projectiles.forEach(p => {
+    for (p of projectiles) {
         if (collision(p, wall)) {
             wall.health -= p.power;
             score += p.power;
         }
-    })
+    }
+    // projectiles.forEach(p => {
+    // })
 }
 // utilities
 function handleGameStatus() {
