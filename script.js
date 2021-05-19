@@ -1,7 +1,7 @@
 const canvas = document.getElementById('canvas1');
 const ctx = canvas.getContext('2d');
-canvas.width = 1200;
-canvas.height = 900;
+canvas.width = 900;
+canvas.height = 700;
 
 // global variables
 const cellSize = 100;

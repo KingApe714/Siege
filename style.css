@@ -8,9 +8,31 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 1200px;
-    height: 900px;
+    width: 900px;
+    height: 700px;
     background: white;
     font-family: 'Orbitron', sans-serif;
     font-family: 'DotGothic16', sans-serif;
+}
+
+.modal-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* color: white; */
+}
+
+.modal {
+    background-color: white;
+    width: 50%;
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
