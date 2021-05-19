@@ -1,3 +1,10 @@
+var modalBtn = document.querySelector('.modal-button');
+var modalBg = document.querySelector('.modal-bg');
+
+modalBtn.addEventListener('click', function() {
+    modalBg.classList.add('bg-active');
+})
+
 const canvas = document.getElementById('canvas1');
 const ctx = canvas.getContext('2d');
 canvas.width = 900;

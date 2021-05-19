@@ -25,11 +25,20 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* color: white; */
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.5s;
+}
+
+.bg-active {
+    visibility: visible;
+    opacity: 1;
 }
 
 .modal {
+    font-family: 'Montserrat', sans-serif;
     background-color: white;
+    border-radius: 5px;
     width: 50%;
     height: 50%;
     display: flex;
