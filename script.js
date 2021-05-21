@@ -1,9 +1,41 @@
-var modalBtn = document.querySelector('.modal-button');
-var modalBg = document.querySelector('.modal-bg');
-var modalClose = document.querySelector('.modal-close');
+const modalBtn = document.querySelector('.modal-button');
+const modalBg = document.querySelector('.modal-bg');
+const modalClose = document.querySelector('.modal-close');
+const instructions = document.querySelector('.instructions')
+const text = document.querySelector('.instructions');
+const strText = text.textContent;
+const splitText = strText.split('');
+text.textContent = "";
+
+for (let i = 0; i < splitText.length; i++) {
+    if (splitText[i] === ' ') {
+        text.innerHTML += "&nbsp;"
+    } else {
+        text.innerHTML += "<span class='letter'>" + splitText[i] + "</span>";
+    }
+}
+
+let char = 0;
+let timer = setInterval(onTick, 50);
+
+function onTick() {
+    const span = text.querySelectorAll('.letter')[char];
+    if (span) span.classList.add('fade');
+    char++;
+    if (char === splitText.length) {
+        complete();
+        return;
+    }
+}
+
+function complete() {
+    clearInterval(timer);
+    timer = null;
+}
 
 modalBtn.addEventListener('click', function() {
     modalBg.classList.add('bg-active');
+    instructions.classList.add('insructions-open');
 })
 modalClose.addEventListener('click', function() {
     modalBg.classList.remove('bg-active');
