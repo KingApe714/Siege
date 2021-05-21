@@ -4,38 +4,43 @@ const modalClose = document.querySelector('.modal-close');
 const instructions = document.querySelector('.instructions')
 const text = document.querySelector('.instructions');
 const strText = text.textContent;
-const splitText = strText.split('');
+const splitText = strText.split(' ');
 text.textContent = "";
 
+// text.innerHTML += "<span>"
 for (let i = 0; i < splitText.length; i++) {
     if (splitText[i] === ' ') {
-        text.innerHTML += "&nbsp;"
+        // text.innerHTML += "</span><span>"
+        // text.innerHTML += "<span>"
     } else {
         text.innerHTML += "<span class='letter'>" + splitText[i] + "</span>";
+        text.innerHTML += "&nbsp;"
     }
 }
-
-let char = 0;
-let timer = setInterval(onTick, 50);
-
-function onTick() {
-    const span = text.querySelectorAll('.letter')[char];
-    if (span) span.classList.add('fade');
-    char++;
-    if (char === splitText.length) {
-        complete();
-        return;
-    }
-}
-
-function complete() {
-    clearInterval(timer);
-    timer = null;
-}
+// text.innerHTML += "</span>"
+console.log(text)
 
 modalBtn.addEventListener('click', function() {
     modalBg.classList.add('bg-active');
-    instructions.classList.add('insructions-open');
+    
+    let char = 0;
+    let timer = setInterval(onTick, 50);
+    
+    function onTick() {
+        const span = text.querySelectorAll('.letter')[char];
+        if (span) span.classList.add('fade');
+        char++;
+        if (char === splitText.length) {
+            complete();
+            return;
+        }
+    }
+    
+    function complete() {
+        clearInterval(timer);
+        timer = null;
+    }
+    
 })
 modalClose.addEventListener('click', function() {
     modalBg.classList.remove('bg-active');
