@@ -7,17 +7,11 @@ const strText = text.textContent;
 const splitText = strText.split(' ');
 text.textContent = "";
 
-// text.innerHTML += "<span>"
 for (let i = 0; i < splitText.length; i++) {
-    if (splitText[i] === ' ') {
-        // text.innerHTML += "</span><span>"
-        // text.innerHTML += "<span>"
-    } else {
-        text.innerHTML += "<span class='letter'>" + splitText[i] + "</span>";
-        text.innerHTML += "&nbsp;"
-    }
+    text.innerHTML += "<span class='letter'>" + splitText[i] + "</span>";
+    text.innerHTML += "&nbsp;"
 }
-// text.innerHTML += "</span>"
+
 console.log(text)
 
 modalBtn.addEventListener('click', function() {
